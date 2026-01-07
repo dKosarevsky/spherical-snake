@@ -67,9 +67,9 @@ def draw_frame(surface: pygame.Surface, state: GameState) -> None:
     apple = orient(state.apple)
     ax, ay = project(apple, size, r)
     if visible(apple):
-        pygame.draw.circle(surface, (255, 70, 70), (ax, ay), 6)
+        pygame.draw.circle(surface, (255, 70, 70), (ax, ay), 10)
     else:
-        pygame.draw.circle(surface, (100, 80, 80), (ax, ay), 6, width=2)
+        pygame.draw.circle(surface, (100, 80, 80), (ax, ay), 10, width=2)
 
     for i, seg in enumerate(reversed(state.snake)):
         seg = orient(seg)
