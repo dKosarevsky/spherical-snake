@@ -133,15 +133,48 @@ loop()
 
 @st.fragment
 def controls() -> None:
-    left_col, right_col = st.columns(2)
-    with left_col:
-        if st.button("⟵ Left", use_container_width=True, shortcut="Left"):
+    st.markdown(
+        """
+        <style>
+        .snake-controls-row {
+            display:flex;
+            gap:12px;
+            width:100%;
+            justify-content:center;
+        }
+        .snake-controls-row [data-testid="column"] {
+            flex:1 !important;
+            min-width:0 !important;
+        }
+        .snake-controls-row .stButton>button {
+            width:100%;
+            min-height:56px;
+            font-size:1.1rem;
+        }
+        @media (max-width: 540px) {
+            .snake-controls-row {
+                gap:8px;
+            }
+            .snake-controls-row .stButton>button {
+                min-height:48px;
+                font-size:1rem;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="snake-controls-row">', unsafe_allow_html=True)
+    col_left, col_right = st.columns(2, gap="small")
+    with col_left:
+        if st.button("", use_container_width=True, shortcut="Left"):
             st.session_state.left = True
             st.session_state.right = False
-    with right_col:
-        if st.button("Right ⟶", use_container_width=True, shortcut="Right"):
+    with col_right:
+        if st.button("", use_container_width=True, shortcut="Right"):
             st.session_state.right = True
             st.session_state.left = False
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 controls()
