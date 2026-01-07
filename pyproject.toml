@@ -3,7 +3,7 @@ name = "spherical-snake"
 version = "0.1.0"
 description = "Spherical Snake game with Streamlit and pygame"
 readme = "README.md"
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.13"
 dependencies = [
     "numpy",
     "pygame",
