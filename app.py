@@ -6,7 +6,7 @@ from io import BytesIO
 import numpy as np
 import pygame
 import streamlit as st
-from PIL import Image, features
+from PIL import Image
 
 from game.core import GameConfig, apple_guidance, new_game, step
 from game.render import draw_frame
@@ -56,21 +56,18 @@ with st.expander("Tuning"):
         help="Minimum angular offset before auto steering kicks in.",
     )
 
-status_box = st.empty()
-frame_box = st.empty()
-
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
 pygame.init()
 
-SIZE = 520
-FRAME_BUFFER = BytesIO()
-FRAME_FORMAT = "WEBP" if features.check("webp") else "JPEG"
-FRAME_MIME = "image/webp" if FRAME_FORMAT == "WEBP" else "image/jpeg"
-FRAME_SAVE_ARGS = {"quality": 80}
-if FRAME_FORMAT == "JPEG":
-    FRAME_SAVE_ARGS.update({"optimize": True})
+try:
+    rt = st.runtime.get_instance()
+    if rt and hasattr(rt, "media_file_mgr"):
+        rt.media_file_mgr.remove_orphaned_files = lambda *_, **__: None
+except Exception:
+    pass
 
+SIZE = 520
 surf = pygame.Surface((SIZE, SIZE))
 
 
@@ -107,13 +104,12 @@ def loop():
     draw_frame(surf, st.session_state.state)
     arr = pygame.surfarray.array3d(surf)  # (w,h,3)
     arr = np.transpose(arr, (1, 0, 2))  # (h,w,3)
-    img = Image.fromarray(arr)
-    FRAME_BUFFER.seek(0)
-    FRAME_BUFFER.truncate(0)
-    img.save(FRAME_BUFFER, format=FRAME_FORMAT, **FRAME_SAVE_ARGS)
-    encoded = base64.b64encode(FRAME_BUFFER.getvalue()).decode("ascii")
-    frame_box.markdown(
-        f'<div style="width:{SIZE}px;height:{SIZE}px;background-image:url(\'data:{FRAME_MIME};base64,{encoded}\');background-size:cover;background-position:center;border-radius:8px;"></div>',
+    img_html = Image.fromarray(arr)
+    buf = BytesIO()
+    img_html.save(buf, format="JPEG", quality=90, optimize=False)
+    encoded = base64.b64encode(buf.getvalue()).decode("ascii")
+    st.markdown(
+        f'<img src="data:image/jpeg;base64,{encoded}" width="{SIZE}" height="{SIZE}" style="display:block;margin:auto;border-radius:12px;background:#050507;" />',
         unsafe_allow_html=True,
     )
     guidance_after = apple_guidance(st.session_state.state)
@@ -129,12 +125,7 @@ def loop():
         else:
             hint = "LEFT" if guidance_after[1] > 0 else "RIGHT"
             status_parts.append(f"Offset: {deg_off:.1f}° {hint}")
-    status_box.caption(" | ".join(status_parts))
-
-
-loop()
-
-with st.container():
+    st.caption(" | ".join(status_parts))
     left_col, right_col = st.columns(2)
     with left_col:
         if st.button("⟵ Left", use_container_width=True, shortcut="Left"):
@@ -144,3 +135,6 @@ with st.container():
         if st.button("Right ⟶", use_container_width=True, shortcut="Right"):
             st.session_state.right = True
             st.session_state.left = False
+
+
+loop()
