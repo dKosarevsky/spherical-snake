@@ -1,0 +1,26 @@
+[project]
+name = "spherical-snake"
+version = "0.1.0"
+description = "Spherical Snake game with Streamlit and pygame"
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "numpy",
+    "pygame",
+    "streamlit",
+    "pillow",
+    "watchdog",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["game"]
+
+[tool.hatch.build.targets.editable]
+packages = ["game"]
+
+[tool.uv]
+# allow uv to manage the project's virtual environment and lockfile
