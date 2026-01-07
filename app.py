@@ -133,54 +133,15 @@ loop()
 
 @st.fragment
 def controls() -> None:
-    st.markdown(
-        """
-        <style>
-        .snake-controls-wrapper {
-            width:100%;
-        }
-        .snake-controls-wrapper [data-testid="column"] {
-            flex:1 !important;
-            min-width:0 !important;
-        }
-        .snake-controls-wrapper .stColumns {
-            display:flex;
-            gap:12px;
-            justify-content:center;
-        }
-        .snake-controls-wrapper .stButton>button {
-            width:100%;
-            min-height:56px;
-            font-size:1.1rem;
-        }
-        @media (max-width: 600px) {
-            .snake-controls-wrapper .stColumns {
-                flex-wrap:nowrap;
-                gap:10px;
-            }
-            .snake-controls-wrapper [data-testid="column"] {
-                flex:1 !important;
-                width:50% !important;
-            }
-            .snake-controls-wrapper .stButton>button {
-                min-height:48px;
-                font-size:1rem;
-            }
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-    with st.container():
-        col_left, col_right = st.columns(2, gap="small")
-        with col_left:
-            if st.button("", use_container_width=True, shortcut="Left"):
-                st.session_state.left = True
-                st.session_state.right = False
-        with col_right:
-            if st.button("", use_container_width=True, shortcut="Right"):
-                st.session_state.right = True
-                st.session_state.left = False
+    cols = st.columns(2, gap="small")
+    with cols[0]:
+        if st.button("←", use_container_width=True, help="Turn left"):
+            st.session_state.left = True
+            st.session_state.right = False
+    with cols[1]:
+        if st.button("→", use_container_width=True, help="Turn right"):
+            st.session_state.right = True
+            st.session_state.left = False
 
 
 controls()
