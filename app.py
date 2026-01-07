@@ -24,17 +24,18 @@ if "right" not in st.session_state:
     st.session_state.right = False
 
 st.title("Spherical Snake")
+st.caption("Controls: use Left/Right arrow keys or the buttons below. Space restarts the game.")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("⟵ Left", use_container_width=True):
+    if st.button("⟵ Left", use_container_width=True, shortcut="Left"):
         st.session_state.left = True
         st.session_state.right = False
 with col2:
-    if st.button("⟳ Restart", use_container_width=True):
+    if st.button("⟳ Restart", use_container_width=True, shortcut="Space"):
         st.session_state.state = new_game(st.session_state.cfg)
 with col3:
-    if st.button("Right ⟶", use_container_width=True):
+    if st.button("Right ⟶", use_container_width=True, shortcut="Right"):
         st.session_state.right = True
         st.session_state.left = False
 
