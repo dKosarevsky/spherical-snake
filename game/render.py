@@ -1,7 +1,7 @@
 import math
 from typing import List, Tuple
 import pygame
-from game.core import GameState, Vec3, angle_between, cross, rotate
+from game.core import GameState, Vec3, cross, dot, normalize, scale, sub
 
 
 def project(p: Vec3, size: int, r: int) -> Tuple[int, int]:
@@ -31,23 +31,25 @@ def _grid_points() -> List[Vec3]:
 GRID_POINTS = _grid_points()
 
 
+def _build_basis(state: GameState):
+    head = normalize(state.snake[0])
+    z_axis = head
+    tangent = sub(state.t, scale(z_axis, dot(z_axis, state.t)))
+    x_axis = normalize(tangent) if tangent != (0.0, 0.0, 0.0) else (1.0, 0.0, 0.0)
+    y_axis = cross(z_axis, x_axis)
+
+    def orient(p: Vec3) -> Vec3:
+        return dot(p, x_axis), dot(p, y_axis), dot(p, z_axis)
+
+    return orient
+
+
 def draw_frame(surface: pygame.Surface, state: GameState) -> None:
     surface.fill((10, 10, 12))
     size = surface.get_width()
     r = int(size * 0.38)
 
-    head = state.snake[0]
-    front = (0.0, 0.0, 1.0)
-    axis = cross(head, front)
-    axis_len_sq = axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]
-    should_rotate = axis_len_sq > 1e-10
-    if should_rotate:
-        angle = angle_between(head, front)
-
-    def orient(p: Vec3) -> Vec3:
-        if not should_rotate:
-            return p
-        return rotate(p, axis, angle)
+    orient = _build_basis(state)
 
     pygame.draw.circle(surface, (200, 200, 210), (size // 2, size // 2), r, width=2)
 
@@ -59,9 +61,11 @@ def draw_frame(surface: pygame.Surface, state: GameState) -> None:
         pygame.draw.circle(surface, (45, 55, 70), (dx, dy), 2)
 
     apple = orient(state.apple)
+    ax, ay = project(apple, size, r)
     if visible(apple):
-        ax, ay = project(apple, size, r)
         pygame.draw.circle(surface, (255, 70, 70), (ax, ay), 6)
+    else:
+        pygame.draw.circle(surface, (100, 80, 80), (ax, ay), 6, width=2)
 
     for i, seg in enumerate(reversed(state.snake)):
         seg = orient(seg)

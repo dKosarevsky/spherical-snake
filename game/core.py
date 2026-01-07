@@ -1,7 +1,7 @@
 import math
 import random
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 Vec3 = Tuple[float, float, float]
 
@@ -128,3 +128,16 @@ def step(state: GameState, cfg: GameConfig, left: bool, right: bool) -> None:
             break
 
     state.t = t
+
+
+def apple_guidance(state: GameState) -> Optional[Tuple[float, float]]:
+    head = state.snake[0]
+    apple = state.apple
+    plane = cross(head, apple)
+    if norm(plane) == 0.0:
+        return None
+    plane = normalize(plane)
+    desired = normalize(cross(plane, head))
+    offset = angle_between(state.t, desired)
+    turn_dir = dot(cross(state.t, desired), head)
+    return offset, turn_dir
