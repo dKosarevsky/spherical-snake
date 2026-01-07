@@ -126,6 +126,13 @@ def loop():
             hint = "LEFT" if guidance_after[1] > 0 else "RIGHT"
             status_parts.append(f"Offset: {deg_off:.1f}° {hint}")
     st.caption(" | ".join(status_parts))
+
+
+loop()
+
+
+@st.fragment
+def controls() -> None:
     left_col, right_col = st.columns(2)
     with left_col:
         if st.button("⟵ Left", use_container_width=True, shortcut="Left"):
@@ -137,4 +144,4 @@ def loop():
             st.session_state.left = False
 
 
-loop()
+controls()
