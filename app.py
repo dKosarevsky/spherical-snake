@@ -41,7 +41,7 @@ if st.button("⟳ Restart", use_container_width=True, shortcut="Space"):
 
 with st.expander("Tuning"):
     st.session_state.cfg.step_rad = st.slider("Speed", 0.01, 0.12, st.session_state.cfg.step_rad, 0.005)
-    st.session_state.cfg.turn_rad = st.slider("Turn", 0.02, 0.30, st.session_state.cfg.turn_rad, 0.01)
+    st.session_state.cfg.turn_rad = st.slider("Turn", 0.02, 0.80, st.session_state.cfg.turn_rad, 0.01)
     st.checkbox(
         "Auto steer toward apple when idle",
         key="auto_steer",

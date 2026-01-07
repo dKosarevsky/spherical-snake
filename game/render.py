@@ -41,7 +41,7 @@ def _build_basis(state: GameState):
     def orient(p: Vec3) -> Vec3:
         return dot(p, x_axis), dot(p, y_axis), dot(p, z_axis)
 
-    return orient
+    return orient, x_axis, y_axis
 
 
 def draw_frame(surface: pygame.Surface, state: GameState) -> None:
@@ -49,7 +49,11 @@ def draw_frame(surface: pygame.Surface, state: GameState) -> None:
     size = surface.get_width()
     r = int(size * 0.38)
 
-    orient = _build_basis(state)
+    orient, x_axis, y_axis = _build_basis(state)
+    tangent2d = (
+        dot(state.t, x_axis),
+        dot(state.t, y_axis),
+    )
 
     pygame.draw.circle(surface, (200, 200, 210), (size // 2, size // 2), r, width=2)
 
@@ -74,4 +78,37 @@ def draw_frame(surface: pygame.Surface, state: GameState) -> None:
         x, y = project(seg, size, r)
         z = max(0.0, min(1.0, (seg[2] + 1.0) / 2.0))
         base = 60 + int(140 * z)
-        pygame.draw.circle(surface, (40, base, 90), (x, y), 5)
+        pygame.draw.circle(surface, (40, base, 90), (x, y), 7)
+
+    head_3d = orient(state.snake[0])
+    if visible(head_3d):
+        hx, hy = project(head_3d, size, r)
+        dir_len = math.hypot(*tangent2d)
+        if dir_len < 1e-5:
+            dir_vec = (1.0, 0.0)
+        else:
+            dir_vec = (tangent2d[0] / dir_len, tangent2d[1] / dir_len)
+        perp_vec = (-dir_vec[1], dir_vec[0])
+        nose = (hx + dir_vec[0] * 18, hy - dir_vec[1] * 18)
+        base_left = (
+            hx - dir_vec[0] * 6 + perp_vec[0] * 10,
+            hy + dir_vec[1] * 6 - perp_vec[1] * 10,
+        )
+        base_right = (
+            hx - dir_vec[0] * 6 - perp_vec[0] * 10,
+            hy + dir_vec[1] * 6 + perp_vec[1] * 10,
+        )
+        pygame.draw.polygon(surface, (60, 200, 110), [nose, base_left, base_right])
+        pygame.draw.circle(surface, (30, 120, 70), (hx, hy), 11)
+        eye_offset = 6
+        eye_forward = 2
+        eye1 = (
+            int(hx - dir_vec[0] * eye_forward + perp_vec[0] * eye_offset),
+            int(hy + dir_vec[1] * eye_forward - perp_vec[1] * eye_offset),
+        )
+        eye2 = (
+            int(hx - dir_vec[0] * eye_forward - perp_vec[0] * eye_offset),
+            int(hy + dir_vec[1] * eye_forward + perp_vec[1] * eye_offset),
+        )
+        pygame.draw.circle(surface, (0, 0, 0), eye1, 2)
+        pygame.draw.circle(surface, (0, 0, 0), eye2, 2)

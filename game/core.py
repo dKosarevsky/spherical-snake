@@ -57,7 +57,7 @@ def random_unit() -> Vec3:
 @dataclass
 class GameConfig:
     step_rad: float = 0.045  # speed
-    turn_rad: float = 0.11  # rotate
+    turn_rad: float = 0.35  # rotation per tick
     eat_angle: float = 0.10  # apple
     self_hit_angle: float = 0.07  # crash
     init_len: int = 12
