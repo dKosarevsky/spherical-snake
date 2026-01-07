@@ -133,7 +133,7 @@ loop()
 
 @st.fragment
 def controls() -> None:
-    cols = st.columns(2, gap="small")
+    cols = st.columns(4)
     with cols[0]:
         if st.button("←", use_container_width=True, help="Turn left"):
             st.session_state.left = True
